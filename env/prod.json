@@ -1,0 +1,9 @@
+{
+  "API_BASE_URL": "https://api.example.com",
+  "CONNECT_TIMEOUT_SECONDS": "15",
+  "RECEIVE_TIMEOUT_SECONDS": "15",
+  "ENABLE_LOGGING": "false",
+  "ENABLE_CERT_PINNING": "true",
+  "PRIMARY_CERT_PIN": "WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=",
+  "BACKUP_CERT_PIN": "r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E="
+}

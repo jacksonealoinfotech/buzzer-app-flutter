@@ -1,0 +1,22 @@
+{
+  "@@locale": "es",
+  "appTitle": "Flutter Clean Base",
+  "homeTitle": "Demostración de Clean Architecture",
+  "themeMode": "Modo de tema",
+  "systemTheme": "Sistema",
+  "lightTheme": "Claro",
+  "darkTheme": "Oscuro",
+  "language": "Idioma",
+  "retry": "Reintentar",
+  "cancel": "Cancelar",
+  "confirm": "Confirmar",
+  "errorGeneric": "Ocurrió un error inesperado. Por favor, inténtelo de nuevo.",
+  "errorNetwork": "No se detectó conexión a internet. Verifique su red.",
+  "errorTimeout": "La solicitud caducó. Por favor, inténtelo de nuevo.",
+  "errorUnauthorized": "Sesión caducada o no autorizada. Inicie sesión nuevamente.",
+  "errorNotFound": "No se encontró el recurso solicitado.",
+  "securityStatus": "Estado de Seguridad y Arquitectura",
+  "securityPassed": "Todas las comprobaciones superadas",
+  "demoFetchSuccess": "¡Datos recuperados con éxito a través del flujo de arquitectura limpia!",
+  "offlineBannerMessage": "Estás desconectado. Se pueden mostrar datos almacenados en caché."
+}

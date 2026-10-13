@@ -1,0 +1,49 @@
+name: Quality & Security CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  analyze_and_test:
+    name: Lint, Test & Security Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Verify Code Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run Build Runner Generation Check
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Verify Git Status (Ensure No Uncommitted Generated Files)
+        run: git diff --exit-code
+
+      - name: Static Analysis
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+      - name: Run Unit & Widget Tests
+        run: flutter test --coverage
+
+      - name: Verify Secret Scanning (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Check for Outdated Vulnerable Dependencies
+        run: dart pub outdated --no-dev-dependencies

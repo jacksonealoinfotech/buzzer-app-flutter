@@ -1,0 +1,25 @@
+{
+  "@@locale": "en",
+  "appTitle": "Flutter Clean Base",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "homeTitle": "Clean Architecture Showcase",
+  "themeMode": "Theme Mode",
+  "systemTheme": "System",
+  "lightTheme": "Light",
+  "darkTheme": "Dark",
+  "language": "Language",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "errorGeneric": "An unexpected error occurred. Please try again.",
+  "errorNetwork": "No internet connection detected. Please check your network.",
+  "errorTimeout": "The request timed out. Please try again.",
+  "errorUnauthorized": "Session expired or unauthorized. Please sign in again.",
+  "errorNotFound": "The requested resource was not found.",
+  "securityStatus": "Security & Architecture Status",
+  "securityPassed": "All Core Checks Passed",
+  "demoFetchSuccess": "Data fetched successfully from clean architecture pipeline!",
+  "offlineBannerMessage": "You are currently offline. Cached data may be shown."
+}
