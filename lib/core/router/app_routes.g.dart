@@ -12,8 +12,11 @@ List<RouteBase> get $appRoutes => [
   $loginRoute,
   $signupRoute,
   $securityCheckRoute,
+  $hostDashboardRoute,
   $joinGameRoute,
   $gameLobbyRoute,
+  $quizQuestionRoute,
+  $quizResultRoute,
 ];
 
 RouteBase get $splashRoute => GoRouteData.$route(
@@ -148,6 +151,33 @@ mixin $SecurityCheckRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $hostDashboardRoute => GoRouteData.$route(
+  path: '/host-dashboard',
+  hasOverriddenOnExit: false,
+  factory: $HostDashboardRoute._fromState,
+);
+
+mixin $HostDashboardRoute on GoRouteData {
+  static HostDashboardRoute _fromState(GoRouterState state) =>
+      const HostDashboardRoute();
+
+  @override
+  String get location => GoRouteData.$location('/host-dashboard');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $joinGameRoute => GoRouteData.$route(
   path: '/join',
   hasOverriddenOnExit: false,
@@ -186,6 +216,60 @@ mixin $GameLobbyRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/gamelobby');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $quizQuestionRoute => GoRouteData.$route(
+  path: '/quizz',
+  hasOverriddenOnExit: false,
+  factory: $QuizQuestionRoute._fromState,
+);
+
+mixin $QuizQuestionRoute on GoRouteData {
+  static QuizQuestionRoute _fromState(GoRouterState state) =>
+      const QuizQuestionRoute();
+
+  @override
+  String get location => GoRouteData.$location('/quizz');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $quizResultRoute => GoRouteData.$route(
+  path: '/result',
+  hasOverriddenOnExit: false,
+  factory: $QuizResultRoute._fromState,
+);
+
+mixin $QuizResultRoute on GoRouteData {
+  static QuizResultRoute _fromState(GoRouterState state) =>
+      const QuizResultRoute();
+
+  @override
+  String get location => GoRouteData.$location('/result');
 
   @override
   void go(BuildContext context) => context.go(location);

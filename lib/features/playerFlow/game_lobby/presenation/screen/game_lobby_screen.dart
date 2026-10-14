@@ -199,12 +199,18 @@ class _GameLobbyScreenState extends State<GameLobbyScreen>
           child: CustomScrollView(
             physics: const ClampingScrollPhysics(),
             slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight:
+                          MediaQuery.of(context).size.height -
+                          MediaQuery.paddingOf(context).vertical -
+                          36,
+                    ),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Logo + leave
@@ -307,19 +313,17 @@ class _GameLobbyScreenState extends State<GameLobbyScreen>
                         ),
 
                         // Countdown ring
-                        Expanded(
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 24),
-                              child: FadeTransition(
-                                opacity: _ringFade,
-                                child: ScaleTransition(
-                                  scale: _ringScale,
-                                  child: _CountdownRing(
-                                    ring: _ring,
-                                    secondsLeft: _secondsLeft,
-                                    floatAnimation: _float,
-                                  ),
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            child: FadeTransition(
+                              opacity: _ringFade,
+                              child: ScaleTransition(
+                                scale: _ringScale,
+                                child: _CountdownRing(
+                                  ring: _ring,
+                                  secondsLeft: _secondsLeft,
+                                  floatAnimation: _float,
                                 ),
                               ),
                             ),
@@ -661,43 +665,43 @@ class _InfoCard extends StatelessWidget {
           ),
         ],
       ),
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            for (var i = 0; i < items.length; i++) ...[
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(items[i].icon, color: cs.primary, size: 22),
-                    const SizedBox(height: 6),
-                    Text(
-                      items[i].label,
-                      style: text.labelSmall?.copyWith(
-                        color: cs.onSurface.withValues(alpha: 0.6),
-                      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(items[i].icon, color: cs.primary, size: 22),
+                  const SizedBox(height: 6),
+                  Text(
+                    items[i].label,
+                    textAlign: TextAlign.center,
+                    style: text.labelSmall?.copyWith(
+                      color: cs.onSurface.withValues(alpha: 0.6),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      items[i].value,
-                      textAlign: TextAlign.center,
-                      style: text.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface,
-                      ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    items[i].value,
+                    textAlign: TextAlign.center,
+                    style: text.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              if (i < items.length - 1)
-                VerticalDivider(
-                  width: 1,
-                  thickness: 1,
-                  color: cs.outlineVariant.withValues(alpha: 0.6),
-                ),
-            ],
+            ),
+            if (i < items.length - 1)
+              Container(
+                width: 1,
+                height: 48,
+                color: cs.outlineVariant.withValues(alpha: 0.6),
+              ),
           ],
-        ),
+        ],
       ),
     );
   }

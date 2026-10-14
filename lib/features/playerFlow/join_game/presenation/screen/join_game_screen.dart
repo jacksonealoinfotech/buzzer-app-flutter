@@ -167,18 +167,7 @@ class _JoinGameScreenState extends State<JoinGameScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Back
-                        _Reveal(
-                          animation: _backAnim,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: IconButton(
-                              onPressed: () => Navigator.maybePop(context),
-                              icon: const Icon(Icons.arrow_back_rounded),
-                              color: cs.onSurface,
-                              tooltip: 'Back',
-                            ),
-                          ),
-                        ),
+
                         const SizedBox(height: 16),
 
                         // Logo (floating)

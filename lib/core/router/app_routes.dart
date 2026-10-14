@@ -1,3 +1,6 @@
+import 'package:buzzer_app/features/hostFlow/host_dashboard/presenation/screen/host_dashboard_screen.dart';
+import 'package:buzzer_app/features/playerFlow/quiz_question/presenation/screen/quiz_question_screen.dart';
+import 'package:buzzer_app/features/playerFlow/quiz_result/presenation/screen/quiz_result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:buzzer_app/features/onboarding/login/presenation/screen/login_screen.dart';
 import 'package:buzzer_app/features/onboarding/selection/presenation/screen/selection_screen.dart';
@@ -71,8 +74,30 @@ class SecurityCheckRoute extends GoRouteData with $SecurityCheckRoute {
       const SecurityCheckScreen();
 }
 
-//Player flow screeens
+//Host flow screens
+@TypedGoRoute<HostDashboardRoute>(path: '/host-dashboard')
+class HostDashboardRoute extends GoRouteData with $HostDashboardRoute {
+  const HostDashboardRoute();
 
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const HostDashboardScreen(
+        hostName: 'name',
+        games: [
+          HostGame(
+            id: 'ididididi',
+            title: 'game',
+            mode: GameMode.quiz,
+            status: GameStatus.completed,
+            questionCount: 30,
+            players: 30,
+            maxPlayers: 30,
+          ),
+        ],
+      );
+}
+
+//Player flow screeens
 @TypedGoRoute<JoinGameRoute>(path: '/join')
 class JoinGameRoute extends GoRouteData with $JoinGameRoute {
   const JoinGameRoute();
@@ -87,15 +112,52 @@ class GameLobbyRoute extends GoRouteData with $GameLobbyRoute {
   const GameLobbyRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const GameLobbyScreen(
-        gameTitle: 'game',
-        participantCount: 10,
-        maxParticipants: 25,
-        gameMode: 'game mode',
-        questionDurationSeconds: 30,
-        questionCount: 50,
-      );
+  Widget build(BuildContext context, GoRouterState state) => GameLobbyScreen(
+    gameTitle: 'game',
+    participantCount: 10,
+    maxParticipants: 25,
+    gameMode: 'game mode',
+    questionDurationSeconds: 30,
+    questionCount: 50,
+    onCountdownFinished: () {
+      const QuizQuestionRoute().push<void>(context);
+    },
+  );
+}
+
+@TypedGoRoute<QuizQuestionRoute>(path: '/quizz')
+class QuizQuestionRoute extends GoRouteData with $QuizQuestionRoute {
+  const QuizQuestionRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => QuizQuestionScreen(
+    gameTitle: 'title',
+    questions: [
+      QuizQuestion(
+        text: 'what is your name?',
+        options: ['jackson', 'jacky', 'john', 'michale'],
+      ),
+    ],
+    onFinished: (value) {
+      const QuizResultRoute().push<void>(context);
+    },
+  );
+}
+
+@TypedGoRoute<QuizResultRoute>(path: '/result')
+class QuizResultRoute extends GoRouteData with $QuizResultRoute {
+  const QuizResultRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => QuizResultScreen(
+    correctAnswers: 10,
+    totalQuestions: 30,
+    rank: 2,
+    totalPlayers: 20,
+    onBackHome: () {
+      const JoinGameRoute().go(context);
+    },
+  );
 }
 
 // @TypedStatefulShellRoute<AppShellRouteData>(

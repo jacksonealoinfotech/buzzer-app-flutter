@@ -1,1 +1,1 @@
-Hello game_lobby!
+Hello quiz_result!

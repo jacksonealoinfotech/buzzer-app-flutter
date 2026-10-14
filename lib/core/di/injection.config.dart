@@ -74,20 +74,11 @@ extension GetItInjectableX on _i174.GetIt {
       preResolve: true,
     );
     gh.lazySingleton<_i982.AppDatabase>(() => storageModule.appDatabase);
-    gh.lazySingleton<_i309.ItemsDao>(
-      () => storageModule.itemsDao(gh<_i982.AppDatabase>()),
-    );
-    gh.lazySingleton<_i978.RedactingLogger>(
-      () => networkModule.redactingLogger(gh<_i993.Talker>()),
-    );
     gh.lazySingleton<_i552.TokenManager>(
       () => networkModule.tokenManager(
         gh<_i77.TokenStorage>(),
         gh<_i460.SharedPreferences>(),
       ),
-    );
-    gh.lazySingleton<_i684.LocalStorageService>(
-      () => storageModule.localStorageService(gh<_i460.SharedPreferences>()),
     );
     gh.lazySingleton<_i383.SecurityService>(
       () => networkModule.securityService(
@@ -95,6 +86,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i812.SecureStorageService>(),
         gh<_i982.AppDatabase>(),
       ),
+    );
+    gh.lazySingleton<_i978.RedactingLogger>(
+      () => networkModule.redactingLogger(gh<_i993.Talker>()),
+    );
+    gh.lazySingleton<_i309.ItemsDao>(
+      () => storageModule.itemsDao(gh<_i982.AppDatabase>()),
+    );
+    gh.lazySingleton<_i684.LocalStorageService>(
+      () => storageModule.localStorageService(gh<_i460.SharedPreferences>()),
     );
     gh.lazySingleton<_i667.DioClient>(
       () => networkModule.dioClient(
