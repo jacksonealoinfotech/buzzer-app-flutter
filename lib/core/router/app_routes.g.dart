@@ -12,15 +12,18 @@ List<RouteBase> get $appRoutes => [
   $loginRoute,
   $signupRoute,
   $securityCheckRoute,
-  $hostDashboardRoute,
+  $hostLoginRoute,
+  $hostSignupRoute,
+  $gameDetailsRoute,
   $joinGameRoute,
   $gameLobbyRoute,
   $quizQuestionRoute,
   $quizResultRoute,
+  $appShellRouteData,
 ];
 
 RouteBase get $splashRoute => GoRouteData.$route(
-  path: '/',
+  path: '/splash',
   hasOverriddenOnExit: false,
   factory: $SplashRoute._fromState,
 );
@@ -29,7 +32,7 @@ mixin $SplashRoute on GoRouteData {
   static SplashRoute _fromState(GoRouterState state) => const SplashRoute();
 
   @override
-  String get location => GoRouteData.$location('/');
+  String get location => GoRouteData.$location('/splash');
 
   @override
   void go(BuildContext context) => context.go(location);
@@ -151,18 +154,72 @@ mixin $SecurityCheckRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $hostDashboardRoute => GoRouteData.$route(
-  path: '/host-dashboard',
+RouteBase get $hostLoginRoute => GoRouteData.$route(
+  path: '/host-login',
   hasOverriddenOnExit: false,
-  factory: $HostDashboardRoute._fromState,
+  factory: $HostLoginRoute._fromState,
 );
 
-mixin $HostDashboardRoute on GoRouteData {
-  static HostDashboardRoute _fromState(GoRouterState state) =>
-      const HostDashboardRoute();
+mixin $HostLoginRoute on GoRouteData {
+  static HostLoginRoute _fromState(GoRouterState state) =>
+      const HostLoginRoute();
 
   @override
-  String get location => GoRouteData.$location('/host-dashboard');
+  String get location => GoRouteData.$location('/host-login');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $hostSignupRoute => GoRouteData.$route(
+  path: '/host-signup',
+  hasOverriddenOnExit: false,
+  factory: $HostSignupRoute._fromState,
+);
+
+mixin $HostSignupRoute on GoRouteData {
+  static HostSignupRoute _fromState(GoRouterState state) =>
+      const HostSignupRoute();
+
+  @override
+  String get location => GoRouteData.$location('/host-signup');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $gameDetailsRoute => GoRouteData.$route(
+  path: '/game-details',
+  hasOverriddenOnExit: false,
+  factory: $GameDetailsRoute._fromState,
+);
+
+mixin $GameDetailsRoute on GoRouteData {
+  static GameDetailsRoute _fromState(GoRouterState state) =>
+      const GameDetailsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/game-details');
 
   @override
   void go(BuildContext context) => context.go(location);
@@ -270,6 +327,106 @@ mixin $QuizResultRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/result');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $appShellRouteData => StatefulShellRouteData.$route(
+  factory: $AppShellRouteDataExtension._fromState,
+  branches: [
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/',
+          hasOverriddenOnExit: false,
+          factory: $DashboardRoute._fromState,
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/create-game',
+          hasOverriddenOnExit: false,
+          factory: $CreateGameRoute._fromState,
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/settings',
+          hasOverriddenOnExit: false,
+          factory: $SettingsRoute._fromState,
+        ),
+      ],
+    ),
+  ],
+);
+
+extension $AppShellRouteDataExtension on AppShellRouteData {
+  static AppShellRouteData _fromState(GoRouterState state) =>
+      const AppShellRouteData();
+}
+
+mixin $DashboardRoute on GoRouteData {
+  static DashboardRoute _fromState(GoRouterState state) =>
+      const DashboardRoute();
+
+  @override
+  String get location => GoRouteData.$location('/');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $CreateGameRoute on GoRouteData {
+  static CreateGameRoute _fromState(GoRouterState state) =>
+      const CreateGameRoute();
+
+  @override
+  String get location => GoRouteData.$location('/create-game');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $SettingsRoute on GoRouteData {
+  static SettingsRoute _fromState(GoRouterState state) => const SettingsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/settings');
 
   @override
   void go(BuildContext context) => context.go(location);

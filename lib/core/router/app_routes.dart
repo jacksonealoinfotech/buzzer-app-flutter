@@ -1,10 +1,15 @@
+import 'package:buzzer_app/features/hostFlow/create_game/presenation/screen/create_game_screen.dart';
+import 'package:buzzer_app/features/hostFlow/game_details/presenation/screen/game_details_screen.dart';
 import 'package:buzzer_app/features/hostFlow/host_dashboard/presenation/screen/host_dashboard_screen.dart';
+import 'package:buzzer_app/features/hostFlow/host_login/presenation/screen/host_login_screen.dart';
+import 'package:buzzer_app/features/hostFlow/host_signup/presenation/screen/host_signup_screen.dart';
+import 'package:buzzer_app/features/hostFlow/settings/presenation/screen/settings_screen.dart';
 import 'package:buzzer_app/features/playerFlow/quiz_question/presenation/screen/quiz_question_screen.dart';
 import 'package:buzzer_app/features/playerFlow/quiz_result/presenation/screen/quiz_result_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:buzzer_app/features/onboarding/login/presenation/screen/login_screen.dart';
+import 'package:buzzer_app/features/playerFlow/login/presenation/screen/login_screen.dart';
 import 'package:buzzer_app/features/onboarding/selection/presenation/screen/selection_screen.dart';
-import 'package:buzzer_app/features/onboarding/signup/presenation/screen/signup_screen.dart';
+import 'package:buzzer_app/features/playerFlow/signup/presenation/screen/signup_screen.dart';
 import 'package:buzzer_app/features/onboarding/splash/presenation/screen/splash_screen.dart';
 import 'package:buzzer_app/features/playerFlow/game_lobby/presenation/screen/game_lobby_screen.dart';
 import 'package:buzzer_app/features/playerFlow/join_game/presenation/screen/join_game_screen.dart';
@@ -15,7 +20,7 @@ part 'app_routes.g.dart';
 
 // dart run build_runner build -d
 
-@TypedGoRoute<SplashRoute>(path: '/')
+@TypedGoRoute<SplashRoute>(path: '/splash')
 class SplashRoute extends GoRouteData with $SplashRoute {
   const SplashRoute();
   @override
@@ -33,7 +38,7 @@ class SelectionRoute extends GoRouteData with $SelectionRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) => SelectionScreen(
     onHost: () {
-      const LoginRoute().push<void>(context);
+      const HostLoginRoute().push<void>(context);
     },
     onPlayer: () {
       const LoginRoute().push<void>(context);
@@ -75,26 +80,45 @@ class SecurityCheckRoute extends GoRouteData with $SecurityCheckRoute {
 }
 
 //Host flow screens
-@TypedGoRoute<HostDashboardRoute>(path: '/host-dashboard')
-class HostDashboardRoute extends GoRouteData with $HostDashboardRoute {
-  const HostDashboardRoute();
+@TypedGoRoute<HostLoginRoute>(path: '/host-login')
+class HostLoginRoute extends GoRouteData with $HostLoginRoute {
+  const HostLoginRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const HostDashboardScreen(
-        hostName: 'name',
-        games: [
-          HostGame(
-            id: 'ididididi',
-            title: 'game',
-            mode: GameMode.quiz,
-            status: GameStatus.completed,
-            questionCount: 30,
-            players: 30,
-            maxPlayers: 30,
-          ),
-        ],
-      );
+      const HostLoginScreen();
+}
+
+@TypedGoRoute<HostSignupRoute>(path: '/host-signup')
+class HostSignupRoute extends GoRouteData with $HostSignupRoute {
+  const HostSignupRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const HostSignupScreen();
+}
+
+@TypedGoRoute<GameDetailsRoute>(path: '/game-details')
+class GameDetailsRoute extends GoRouteData with $GameDetailsRoute {
+  const GameDetailsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => GameDetailsScreen(
+    game: GameDetails(
+      id: 'id',
+      code: 'code',
+      title: 'title',
+      description: 'description',
+      mode: GameMode.quiz,
+      status: GameStatus.completed,
+      startsAt: DateTime.now(),
+      timeZone: '',
+      questionDurationSeconds: 30,
+      openRegistration: false,
+      players: 10,
+      maxPlayers: 30,
+    ),
+  );
 }
 
 //Player flow screeens
@@ -160,17 +184,23 @@ class QuizResultRoute extends GoRouteData with $QuizResultRoute {
   );
 }
 
-// @TypedStatefulShellRoute<AppShellRouteData>(
-//   branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
-//     TypedStatefulShellBranch<HomeBranchData>(routes: <TypedRoute<RouteData>>[]),
-//     TypedStatefulShellBranch<ExploreBranchData>(
-//       routes: <TypedRoute<RouteData>>[TypedRoute()],
-//     ),
-//     TypedStatefulShellBranch<SettingsBranchData>(
-//       routes: <TypedRoute<RouteData>>[TypedRoute()],
-//     ),
-//   ],
-// )
+@TypedStatefulShellRoute<AppShellRouteData>(
+  branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
+    TypedStatefulShellBranch<DashboardBranchData>(
+      routes: <TypedRoute<RouteData>>[TypedGoRoute<DashboardRoute>(path: '/')],
+    ),
+    TypedStatefulShellBranch<CreateGameBranchData>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<CreateGameRoute>(path: '/create-game'),
+      ],
+    ),
+    TypedStatefulShellBranch<SettingsBranchData>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<SettingsRoute>(path: '/settings'),
+      ],
+    ),
+  ],
+)
 class AppShellRouteData extends StatefulShellRouteData {
   const AppShellRouteData();
 
@@ -192,12 +222,12 @@ class AppShellRouteData extends StatefulShellRouteData {
         AdaptiveNavigationDestination(
           icon: Icon(Icons.home_outlined),
           selectedIcon: Icon(Icons.home_rounded),
-          label: 'Showcase',
+          label: 'Dashboard',
         ),
         AdaptiveNavigationDestination(
           icon: Icon(Icons.explore_outlined),
           selectedIcon: Icon(Icons.explore_rounded),
-          label: 'Explore',
+          label: 'create',
         ),
         AdaptiveNavigationDestination(
           icon: Icon(Icons.settings_outlined),
@@ -210,14 +240,54 @@ class AppShellRouteData extends StatefulShellRouteData {
   }
 }
 
-// class HomeBranchData extends StatefulShellBranchData {
-//   const HomeBranchData();
-// }
+class DashboardBranchData extends StatefulShellBranchData {
+  const DashboardBranchData();
+}
 
-// class ExploreBranchData extends StatefulShellBranchData {
-//   const ExploreBranchData();
-// }
+class CreateGameBranchData extends StatefulShellBranchData {
+  const CreateGameBranchData();
+}
 
-// class SettingsBranchData extends StatefulShellBranchData {
-//   const SettingsBranchData();
-// }
+class SettingsBranchData extends StatefulShellBranchData {
+  const SettingsBranchData();
+}
+
+class DashboardRoute extends GoRouteData with $DashboardRoute {
+  const DashboardRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const HostDashboardScreen(
+        hostName: 'name',
+        games: [
+          HostGame(
+            id: 'ididididi',
+            title: 'game',
+            mode: GameMode.quiz,
+            status: GameStatus.completed,
+            questionCount: 30,
+            players: 30,
+            maxPlayers: 30,
+          ),
+        ],
+      );
+}
+
+class CreateGameRoute extends GoRouteData with $CreateGameRoute {
+  const CreateGameRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => CreateGameScreen(
+    onPickPdf: () async {
+      return null;
+    },
+  );
+}
+
+class SettingsRoute extends GoRouteData with $SettingsRoute {
+  const SettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const SettingsScreen(hostName: 'name', email: 'email');
+}

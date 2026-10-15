@@ -1,3 +1,4 @@
+import 'package:buzzer_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:buzzer_app/core/responsive/responsive_context.dart';
 
@@ -46,6 +47,8 @@ class AdaptiveNavigationScaffold extends StatelessWidget {
         body: body,
         floatingActionButton: floatingActionButton,
         bottomNavigationBar: NavigationBar(
+          backgroundColor: Colors.transparent,
+          indicatorColor: AppColors.darkOnTertiary,
           selectedIndex: selectedIndex,
           onDestinationSelected: onDestinationSelected,
           destinations: destinations.map((dest) {
@@ -66,6 +69,8 @@ class AdaptiveNavigationScaffold extends StatelessWidget {
         body: Row(
           children: [
             NavigationRail(
+              backgroundColor: Colors.transparent,
+              indicatorColor: AppColors.darkOnTertiary,
               selectedIndex: selectedIndex,
               onDestinationSelected: onDestinationSelected,
               labelType: NavigationRailLabelType.selected,
@@ -93,6 +98,8 @@ class AdaptiveNavigationScaffold extends StatelessWidget {
           SizedBox(
             width: 280,
             child: NavigationDrawer(
+              backgroundColor: Colors.transparent,
+              indicatorColor: AppColors.darkOnTertiary,
               selectedIndex: selectedIndex,
               onDestinationSelected: onDestinationSelected,
               children: [
