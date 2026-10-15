@@ -267,42 +267,7 @@ class _HostDashboardScreenState extends State<HostDashboardScreen>
           .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
         backgroundColor: cs.surface,
-        bottomNavigationBar: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.6)),
-            ),
-          ),
-          child: NavigationBar(
-            selectedIndex: 0,
-            backgroundColor: cs.surfaceContainerLowest,
-            indicatorColor: cs.primaryContainer,
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
-            onDestinationSelected: (i) {
-              HapticFeedback.selectionClick();
-              if (i == 1) widget.onCreateGame?.call();
-              if (i == 2) widget.onSettings?.call();
-            },
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home_rounded),
-                label: 'Home',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.add_circle_outline_rounded),
-                selectedIcon: Icon(Icons.add_circle_rounded),
-                label: 'Create',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings_rounded),
-                label: 'Settings',
-              ),
-            ],
-          ),
-        ),
+
         body: Stack(
           children: [
             _Background(animation: _float),

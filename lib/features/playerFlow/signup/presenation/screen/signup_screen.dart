@@ -3,46 +3,48 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({
-    super.key,
-    this.onSignIn,
-    this.onCreateAccount,
-    this.onForgotPassword,
-  });
+/// Buzzer – Sign up (Create Your Account) screen.
+///
+/// • Uses ONLY `Theme.of(context).colorScheme` → light/dark works automatically.
+/// • Requires Flutter 3.27+ (`Color.withValues`). On older versions replace
+///   `.withValues(alpha: x)` with `.withOpacity(x)`.
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key, this.onSignUp, this.onSignIn});
 
-  final Future<void> Function(String email, String password, bool remember)?
-  onSignIn;
-  final VoidCallback? onCreateAccount;
-  final VoidCallback? onForgotPassword;
+  /// Plug your API / Firebase call here. Throw an exception to show an error.
+  final Future<void> Function(String name, String email, String password)?
+  onSignUp;
+
+  /// Called when the user taps "Sign in" at the bottom.
+  final VoidCallback? onSignIn;
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
+class _SignUpScreenState extends State<SignUpScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _nameFocus = FocusNode();
   final _emailFocus = FocusNode();
   final _passFocus = FocusNode();
 
-  late final AnimationController _entrance; // staggered intro
-  late final AnimationController _float; // logo + background drift
-  late final AnimationController _shake; // error shake
+  late final AnimationController _entrance;
+  late final AnimationController _float;
+  late final AnimationController _shake;
 
-  late final Animation<double> _logoScale;
-  late final Animation<double> _logoFade;
+  late final Animation<double> _backAnim;
   late final Animation<double> _titleAnim;
+  late final Animation<double> _nameAnim;
   late final Animation<double> _emailAnim;
   late final Animation<double> _passAnim;
-  late final Animation<double> _optionsAnim;
   late final Animation<double> _buttonAnim;
   late final Animation<double> _footerAnim;
 
   bool _obscure = true;
-  bool _remember = true;
   bool _loading = false;
 
   static final _emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
@@ -53,8 +55,8 @@ class _LoginScreenState extends State<LoginScreen>
 
     _entrance = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    );
+      duration: const Duration(milliseconds: 1300),
+    )..forward();
     _float = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
@@ -64,24 +66,18 @@ class _LoginScreenState extends State<LoginScreen>
       duration: const Duration(milliseconds: 450),
     );
 
-    Animation<double> stagger(double begin, double end) => CurvedAnimation(
+    Animation<double> stagger(double b, double e) => CurvedAnimation(
       parent: _entrance,
-      curve: Interval(begin, end, curve: Curves.easeOutCubic),
+      curve: Interval(b, e, curve: Curves.easeOutCubic),
     );
 
-    _logoScale = CurvedAnimation(
-      parent: _entrance,
-      curve: const Interval(0.0, 0.45, curve: Curves.elasticOut),
-    );
-    _logoFade = stagger(0.0, 0.25);
-    _titleAnim = stagger(0.15, 0.50);
-    _emailAnim = stagger(0.28, 0.62);
-    _passAnim = stagger(0.38, 0.72);
-    _optionsAnim = stagger(0.48, 0.82);
+    _backAnim = stagger(0.0, 0.3);
+    _titleAnim = stagger(0.10, 0.45);
+    _nameAnim = stagger(0.25, 0.60);
+    _emailAnim = stagger(0.35, 0.70);
+    _passAnim = stagger(0.45, 0.80);
     _buttonAnim = stagger(0.58, 0.92);
     _footerAnim = stagger(0.70, 1.0);
-
-    _entrance.forward();
   }
 
   @override
@@ -89,39 +85,41 @@ class _LoginScreenState extends State<LoginScreen>
     _entrance.dispose();
     _float.dispose();
     _shake.dispose();
+    _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
+    _nameFocus.dispose();
     _emailFocus.dispose();
     _passFocus.dispose();
     super.dispose();
   }
 
-  Future<void> _demoSignIn(String email, String password, bool remember) =>
+  Future<void> _demoSignUp(String name, String email, String password) =>
       Future.delayed(const Duration(milliseconds: 1500));
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
-      await HapticFeedback.lightImpact();
+      HapticFeedback.lightImpact();
       _shake.forward(from: 0);
       return;
     }
 
     setState(() => _loading = true);
     try {
-      await (widget.onSignIn ?? _demoSignIn)(
+      await (widget.onSignUp ?? _demoSignUp)(
+        _nameCtrl.text.trim(),
         _emailCtrl.text.trim(),
         _passCtrl.text,
-        _remember,
       );
       TextInput.finishAutofillContext();
-      // TODO: navigate to home, e.g. Navigator.pushReplacement(...)
+      // TODO: navigate to home / verify email screen
     } catch (e) {
       if (!mounted) return;
-      await HapticFeedback.mediumImpact();
+      HapticFeedback.mediumImpact();
       _shake.forward(from: 0);
-      _showError('Sign in failed. Please check your details and try again.');
+      _showError('Could not create your account. Please try again.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -164,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen>
       backgroundColor: cs.surface,
       body: Stack(
         children: [
-          _AnimatedBackground(animation: _float),
+          _Background(animation: _float),
           SafeArea(
             child: GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
@@ -179,40 +177,20 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Back button
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: IconButton(
-                            onPressed: () => Navigator.maybePop(context),
-                            icon: const Icon(Icons.arrow_back_rounded),
-                            color: cs.onSurface,
-                            tooltip: 'Back',
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Logo
-                        Center(
-                          child: FadeTransition(
-                            opacity: _logoFade,
-                            child: ScaleTransition(
-                              scale: _logoScale,
-                              child: AnimatedBuilder(
-                                animation: _float,
-                                builder: (context, child) {
-                                  final dy =
-                                      math.sin(_float.value * math.pi) * 6;
-                                  return Transform.translate(
-                                    offset: Offset(0, -dy),
-                                    child: child,
-                                  );
-                                },
-                                child: const _BuzzerLogo(),
-                              ),
+                        // Back
+                        _Reveal(
+                          animation: _backAnim,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: IconButton(
+                              onPressed: () => Navigator.maybePop(context),
+                              icon: const Icon(Icons.arrow_back_rounded),
+                              color: cs.onSurface,
+                              tooltip: 'Back',
                             ),
                           ),
                         ),
-                        const SizedBox(height: 36),
+                        const SizedBox(height: 20),
 
                         // Title
                         _Reveal(
@@ -221,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Welcome Back',
+                                'Create Your Account',
                                 style: text.headlineMedium?.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: cs.onSurface,
@@ -229,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'Sign in to your host account',
+                                'Start playing amazing competitions.',
                                 style: text.bodyMedium?.copyWith(color: muted),
                               ),
                             ],
@@ -255,6 +233,43 @@ class _LoginScreenState extends State<LoginScreen>
                                   AutovalidateMode.onUserInteraction,
                               child: Column(
                                 children: [
+                                  _Reveal(
+                                    animation: _nameAnim,
+                                    child: _GlowField(
+                                      focusNode: _nameFocus,
+                                      child: TextFormField(
+                                        controller: _nameCtrl,
+                                        focusNode: _nameFocus,
+                                        textCapitalization:
+                                            TextCapitalization.words,
+                                        keyboardType: TextInputType.name,
+                                        textInputAction: TextInputAction.next,
+                                        autofillHints: const [
+                                          AutofillHints.name,
+                                        ],
+                                        enabled: !_loading,
+                                        decoration: _decoration(
+                                          context,
+                                          label: 'Full name',
+                                          hint: 'John Doe',
+                                          icon: Icons.person_outline_rounded,
+                                        ),
+                                        validator: (v) {
+                                          final value = v?.trim() ?? '';
+                                          if (value.isEmpty) {
+                                            return 'Please enter your name';
+                                          }
+                                          if (value.length < 2) {
+                                            return 'Name is too short';
+                                          }
+                                          return null;
+                                        },
+                                        onFieldSubmitted: (_) =>
+                                            _emailFocus.requestFocus(),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
                                   _Reveal(
                                     animation: _emailAnim,
                                     child: _GlowField(
@@ -293,59 +308,70 @@ class _LoginScreenState extends State<LoginScreen>
                                   const SizedBox(height: 16),
                                   _Reveal(
                                     animation: _passAnim,
-                                    child: _GlowField(
-                                      focusNode: _passFocus,
-                                      child: TextFormField(
-                                        controller: _passCtrl,
-                                        focusNode: _passFocus,
-                                        obscureText: _obscure,
-                                        textInputAction: TextInputAction.done,
-                                        autofillHints: const [
-                                          AutofillHints.password,
-                                        ],
-                                        enabled: !_loading,
-                                        decoration: _decoration(
-                                          context,
-                                          label: 'Password',
-                                          hint: '••••••••',
-                                          icon: Icons.lock_outline_rounded,
-                                          suffix: IconButton(
-                                            tooltip: _obscure
-                                                ? 'Show password'
-                                                : 'Hide password',
-                                            onPressed: () => setState(
-                                              () => _obscure = !_obscure,
-                                            ),
-                                            icon: AnimatedSwitcher(
-                                              duration: const Duration(
-                                                milliseconds: 200,
-                                              ),
-                                              transitionBuilder: (c, a) =>
-                                                  ScaleTransition(
-                                                    scale: a,
-                                                    child: c,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _GlowField(
+                                          focusNode: _passFocus,
+                                          child: TextFormField(
+                                            controller: _passCtrl,
+                                            focusNode: _passFocus,
+                                            obscureText: _obscure,
+                                            textInputAction:
+                                                TextInputAction.done,
+                                            autofillHints: const [
+                                              AutofillHints.newPassword,
+                                            ],
+                                            enabled: !_loading,
+                                            decoration: _decoration(
+                                              context,
+                                              label: 'Password',
+                                              hint: '••••••••',
+                                              icon: Icons.lock_outline_rounded,
+                                              suffix: IconButton(
+                                                tooltip: _obscure
+                                                    ? 'Show password'
+                                                    : 'Hide password',
+                                                onPressed: () => setState(
+                                                  () => _obscure = !_obscure,
+                                                ),
+                                                icon: AnimatedSwitcher(
+                                                  duration: const Duration(
+                                                    milliseconds: 200,
                                                   ),
-                                              child: Icon(
-                                                _obscure
-                                                    ? Icons
-                                                          .visibility_off_outlined
-                                                    : Icons.visibility_outlined,
-                                                key: ValueKey(_obscure),
+                                                  transitionBuilder: (c, a) =>
+                                                      ScaleTransition(
+                                                        scale: a,
+                                                        child: c,
+                                                      ),
+                                                  child: Icon(
+                                                    _obscure
+                                                        ? Icons
+                                                              .visibility_off_outlined
+                                                        : Icons
+                                                              .visibility_outlined,
+                                                    key: ValueKey(_obscure),
+                                                  ),
+                                                ),
                                               ),
                                             ),
+                                            validator: (v) {
+                                              if (v == null || v.isEmpty) {
+                                                return 'Please create a password';
+                                              }
+                                              if (v.length < 8) {
+                                                return 'Use at least 8 characters';
+                                              }
+                                              return null;
+                                            },
+                                            onFieldSubmitted: (_) => _submit(),
                                           ),
                                         ),
-                                        validator: (v) {
-                                          if (v == null || v.isEmpty) {
-                                            return 'Please enter your password';
-                                          }
-                                          if (v.length < 6) {
-                                            return 'Password must be at least 6 characters';
-                                          }
-                                          return null;
-                                        },
-                                        onFieldSubmitted: (_) => _submit(),
-                                      ),
+                                        _PasswordStrength(
+                                          controller: _passCtrl,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -353,35 +379,18 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 24),
 
-                        // Remember me + Forgot password
-                        _Reveal(
-                          animation: _optionsAnim,
-                          child: Row(
-                            children: [
-                              const Spacer(),
-                              TextButton(
-                                onPressed: _loading
-                                    ? null
-                                    : widget.onForgotPassword,
-                                child: const Text('Forgot password?'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Sign in button
+                        // Create account button
                         _Reveal(
                           animation: _buttonAnim,
                           child: _GradientButton(
-                            label: 'Sign In',
+                            label: 'Create Account',
                             loading: _loading,
                             onPressed: _loading ? null : _submit,
                           ),
                         ),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 24),
 
                         // Footer
                         _Reveal(
@@ -392,13 +401,11 @@ class _LoginScreenState extends State<LoginScreen>
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
-                                  "Don't have an account?",
+                                  'Already have an account?',
                                   style: text.bodySmall?.copyWith(color: muted),
                                 ),
                                 TextButton(
-                                  onPressed: _loading
-                                      ? null
-                                      : widget.onCreateAccount,
+                                  onPressed: _loading ? null : widget.onSignIn,
                                   style: TextButton.styleFrom(
                                     minimumSize: const Size(0, 36),
                                     padding: const EdgeInsets.symmetric(
@@ -408,7 +415,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  child: const Text('Create account'),
+                                  child: const Text('Sign in'),
                                 ),
                               ],
                             ),
@@ -460,6 +467,89 @@ class _LoginScreenState extends State<LoginScreen>
   }
 }
 
+/// Animated 4-segment password strength meter + label.
+class _PasswordStrength extends StatelessWidget {
+  const _PasswordStrength({required this.controller});
+
+  final TextEditingController controller;
+
+  static const _labels = ['Weak', 'Fair', 'Good', 'Strong'];
+
+  int _score(String p) {
+    var s = 0;
+    if (p.length >= 8) s++;
+    if (RegExp(r'[a-z]').hasMatch(p) && RegExp(r'[A-Z]').hasMatch(p)) s++;
+    if (RegExp(r'\d').hasMatch(p)) s++;
+    if (RegExp(r'[^A-Za-z0-9]').hasMatch(p)) s++;
+    if (p.length < 8) s = math.min(s, 1);
+    return math.max(s, 1);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final colors = [cs.error, cs.secondary, cs.tertiary, cs.primary];
+
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final p = controller.text;
+        final visible = p.isNotEmpty;
+        final score = visible ? _score(p) : 0;
+        final color = visible ? colors[score - 1] : cs.outlineVariant;
+
+        return AnimatedSize(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          alignment: Alignment.topCenter,
+          child: !visible
+              ? const SizedBox(width: double.infinity)
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 10, 4, 0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: List.generate(4, (i) {
+                            final active = i < score;
+                            return Expanded(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                                height: 5,
+                                margin: EdgeInsets.only(right: i < 3 ? 6 : 0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  color: active
+                                      ? color
+                                      : cs.outlineVariant.withValues(
+                                          alpha: 0.6,
+                                        ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 250),
+                        style: (text.labelMedium ?? const TextStyle()).copyWith(
+                          color: color,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        child: Text(_labels[score - 1]),
+                      ),
+                    ],
+                  ),
+                ),
+        );
+      },
+    );
+  }
+}
+
 /// Fade + slide-up wrapper for staggered intro.
 class _Reveal extends StatelessWidget {
   const _Reveal({required this.animation, required this.child});
@@ -473,7 +563,7 @@ class _Reveal extends StatelessWidget {
       opacity: animation,
       child: SlideTransition(
         position: Tween<Offset>(
-          begin: const Offset(0, 0.18),
+          begin: const Offset(0, 0.15),
           end: Offset.zero,
         ).animate(animation),
         child: child,
@@ -580,25 +670,14 @@ class _GradientButton extends StatelessWidget {
                             color: cs.onPrimary,
                           ),
                         )
-                      : Row(
+                      : Text(
+                          label,
                           key: const ValueKey('label'),
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              label,
-                              style: TextStyle(
-                                color: cs.onPrimary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.arrow_forward_rounded,
-                              color: cs.onPrimary,
-                              size: 20,
-                            ),
-                          ],
+                          style: TextStyle(
+                            color: cs.onPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                 ),
               ),
@@ -610,43 +689,9 @@ class _GradientButton extends StatelessWidget {
   }
 }
 
-/// Bolt icon + "Buzzer" wordmark.
-class _BuzzerLogo extends StatelessWidget {
-  const _BuzzerLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ShaderMask(
-          shaderCallback: (rect) => LinearGradient(
-            colors: [cs.primary, cs.tertiary],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ).createShader(rect),
-          child: const Icon(Icons.bolt_rounded, size: 44, color: Colors.white),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          'Buzzer',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w900,
-            fontStyle: FontStyle.italic,
-            letterSpacing: -0.5,
-            color: cs.primary,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 /// Two soft blurred blobs that slowly drift – built from theme colors.
-class _AnimatedBackground extends StatelessWidget {
-  const _AnimatedBackground({required this.animation});
+class _Background extends StatelessWidget {
+  const _Background({required this.animation});
 
   final Animation<double> animation;
 
@@ -660,7 +705,7 @@ class _AnimatedBackground extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: RadialGradient(
-          colors: [color.withValues(alpha: 0.55), color.withValues(alpha: 0)],
+          colors: [color.withValues(alpha: 0.5), color.withValues(alpha: 0)],
         ),
       ),
     );

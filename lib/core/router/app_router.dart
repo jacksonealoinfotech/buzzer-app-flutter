@@ -17,7 +17,7 @@ GoRouter createAppRouter({
 }) {
   return GoRouter(
     navigatorKey: MessengerService.rootNavigatorKey,
-    initialLocation: '/',
+    initialLocation: '/splash',
     routes: $appRoutes,
     refreshListenable: GoRouterRefreshStream(
       tokenManager.isAuthenticatedStream,
