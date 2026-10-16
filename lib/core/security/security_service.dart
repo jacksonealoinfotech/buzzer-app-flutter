@@ -15,18 +15,7 @@ final class SecurityService {
   final SecureStorageService _secureStorageService;
   final Future<void> Function()? _onDatabaseWipe;
 
-  /// Comprehensive system-wide wipe (OWASP MASVS Right-to-Erase / Emergency Purge).
-  ///
-  /// Clears:
-  /// - In-memory access token & authentication state
-  /// - Hardware-backed secure storage (refresh token, encryption keys)
-  /// - Local encrypted SQLite database
-  /// - In-memory caches and active sessions
-  ///
-  /// Invoked on: user logout, account deletion, refresh token rejection/tampering,
-  /// or root/jailbreak detection block policy.
   Future<void> wipeAll() async {
-    // 1. Wipe credentials
     await _tokenManager.clearTokens();
 
     // 2. Wipe secure key-value store

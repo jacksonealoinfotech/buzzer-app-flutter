@@ -16,6 +16,30 @@ import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 import 'package:talker/talker.dart' as _i993;
 
+import '../../features/hostFlow/host_login/data/repoImple/host_login_repo_imple.dart'
+    as _i524;
+import '../../features/hostFlow/host_login/data/service/host_login_service.dart'
+    as _i89;
+import '../../features/hostFlow/host_login/data/service_imple/host_login_service_imple.dart'
+    as _i330;
+import '../../features/hostFlow/host_login/domain/repo/host_login_repo.dart'
+    as _i54;
+import '../../features/hostFlow/host_login/domain/usecase/host_login_usecase.dart'
+    as _i412;
+import '../../features/hostFlow/host_login/presenation/bloc/host_login_bloc.dart'
+    as _i384;
+import '../../features/hostFlow/host_signup/data/repoImple/host_signup_repo_imple.dart'
+    as _i260;
+import '../../features/hostFlow/host_signup/data/service/host_signup_service.dart'
+    as _i9;
+import '../../features/hostFlow/host_signup/data/service_imple/host_signup_service_imple.dart'
+    as _i274;
+import '../../features/hostFlow/host_signup/domain/repo/host_signup_repo.dart'
+    as _i163;
+import '../../features/hostFlow/host_signup/domain/usecase/host_signup_usecase.dart'
+    as _i60;
+import '../../features/hostFlow/host_signup/presenation/bloc/host_signup_bloc.dart'
+    as _i551;
 import '../config/remote_config_hook.dart' as _i5;
 import '../database/app_database.dart' as _i982;
 import '../database/daos/items_dao.dart' as _i309;
@@ -102,6 +126,38 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i978.RedactingLogger>(),
         gh<_i552.TokenManager>(),
         gh<_i383.SecurityService>(),
+      ),
+    );
+    gh.lazySingleton<_i9.HostSignupService>(
+      () => _i274.HostSignupServiceImple(dioClient: gh<_i667.DioClient>()),
+    );
+    gh.lazySingleton<_i89.HostLoginService>(
+      () => _i330.HostLoginServiceImple(dioClient: gh<_i667.DioClient>()),
+    );
+    gh.lazySingleton<_i163.HostSignupRepo>(
+      () => _i260.HostSignupRepoImple(
+        hostSignupService: gh<_i9.HostSignupService>(),
+      ),
+    );
+    gh.lazySingleton<_i60.HostSignupUsecase>(
+      () => _i60.HostSignupUsecase(repo: gh<_i163.HostSignupRepo>()),
+    );
+    gh.lazySingleton<_i54.HostLoginRepo>(
+      () => _i524.HostLoginRepoImple(service: gh<_i89.HostLoginService>()),
+    );
+    gh.factory<_i412.HostLoginUsecase>(
+      () => _i412.HostLoginUsecase(repo: gh<_i54.HostLoginRepo>()),
+    );
+    gh.factory<_i551.HostSignupBloc>(
+      () => _i551.HostSignupBloc(
+        hostSignupUsecase: gh<_i60.HostSignupUsecase>(),
+        tokenManager: gh<_i552.TokenManager>(),
+      ),
+    );
+    gh.factory<_i384.HostLoginBloc>(
+      () => _i384.HostLoginBloc(
+        hostLoginUsecase: gh<_i412.HostLoginUsecase>(),
+        tokenManager: gh<_i552.TokenManager>(),
       ),
     );
     return this;

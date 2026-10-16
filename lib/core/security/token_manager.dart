@@ -6,12 +6,6 @@ import 'package:buzzer_app/core/constants/storage_keys.dart';
 import 'package:buzzer_app/core/security/token_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Single source of truth for authentication tokens adhering to OWASP MASVS:
-/// - Access tokens are held IN MEMORY ONLY (never persisted to disk).
-/// - Refresh tokens are stored ONLY in secure storage.
-/// - Single-flight proactively managed refresh queue.
-/// - Refresh token rotation support.
-/// - Automatic purge of stale iOS Keychain credentials on fresh install.
 final class TokenManager {
   TokenManager({
     required TokenStorage tokenStorage,
@@ -24,6 +18,7 @@ final class TokenManager {
 
   // IN-MEMORY ONLY storage for access token
   String? _inMemoryAccessToken;
+  bool _hasStoredRefreshToken = false;
 
   // Single-flight refresh coordination
   Completer<String?>? _refreshCompleter;
@@ -35,10 +30,9 @@ final class TokenManager {
   Stream<bool> get isAuthenticatedStream => _authStateController.stream;
 
   bool get isAuthenticated =>
-      _inMemoryAccessToken != null && _inMemoryAccessToken!.isNotEmpty;
+      _hasStoredRefreshToken ||
+      (_inMemoryAccessToken != null && _inMemoryAccessToken!.isNotEmpty);
 
-  /// Initializes TokenManager. Must be called on application bootstrap.
-  /// Detects first launch and wipes stale Keychain data left over from prior installs.
   Future<void> initialize() async {
     final hasRunBefore =
         _preferences.getBool(StorageKeys.hasRunBefore) ?? false;
@@ -49,7 +43,8 @@ final class TokenManager {
     }
 
     final refreshToken = await _tokenStorage.getRefreshToken();
-    _authStateController.add(refreshToken != null && refreshToken.isNotEmpty);
+    _hasStoredRefreshToken = refreshToken != null && refreshToken.isNotEmpty;
+    _authStateController.add(_hasStoredRefreshToken);
   }
 
   /// Returns the current in-memory access token.
@@ -58,15 +53,13 @@ final class TokenManager {
   /// Returns the stored refresh token from secure storage.
   Future<String?> getRefreshToken() => _tokenStorage.getRefreshToken();
 
-  /// Saves newly acquired tokens.
-  /// - Access token is retained in-memory.
-  /// - Refresh token is persisted to hardware secure storage.
   Future<void> saveTokens({
     required String accessToken,
     required String refreshToken,
   }) async {
     _inMemoryAccessToken = accessToken;
     await _tokenStorage.saveRefreshToken(refreshToken);
+    _hasStoredRefreshToken = refreshToken.isNotEmpty;
     _authStateController.add(true);
   }
 
@@ -79,6 +72,7 @@ final class TokenManager {
   /// Wipes all in-memory and persistent token state.
   Future<void> clearTokens() async {
     _inMemoryAccessToken = null;
+    _hasStoredRefreshToken = false;
     await _tokenStorage.deleteRefreshToken();
     _authStateController.add(false);
   }
@@ -90,8 +84,9 @@ final class TokenManager {
     if (token == null) return true;
 
     final expiry = extractJwtExpiry(token);
-    if (expiry == null)
+    if (expiry == null) {
       return false; // If not a valid JWT, rely on HTTP 401 interceptor
+    }
 
     final threshold = DateTime.now().add(AppDurations.tokenExpirySafetyWindow);
     return expiry.isBefore(threshold);
@@ -134,6 +129,7 @@ final class TokenManager {
         await _tokenStorage.saveRefreshToken(newRefreshToken);
       }
 
+      _hasStoredRefreshToken = true;
       _authStateController.add(true);
       _refreshCompleter?.complete(newAccessToken);
       return newAccessToken;

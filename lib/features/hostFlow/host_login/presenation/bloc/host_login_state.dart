@@ -1,17 +1,14 @@
 part of 'host_login_bloc.dart';
 
 class HostLoginState {
-  final bool isLoading;
+  final RequestStatus status;
+  final String? errorMsg;
+  const HostLoginState({this.status = RequestStatus.initial, this.errorMsg});
 
-  const HostLoginState({
-    this.isLoading = false,
-  });
-
-  HostLoginState copyWith({
-    bool? isLoading,
-  }) {
+  HostLoginState copyWith({RequestStatus? status, String? errorMsg}) {
     return HostLoginState(
-      isLoading: isLoading ?? this.isLoading,
+      status: status ?? this.status,
+      errorMsg: errorMsg ?? this.errorMsg,
     );
   }
 }

@@ -1,13 +1,10 @@
+import 'dart:convert';
 import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:buzzer_app/core/error/app_exception.dart';
 
-/// Network security enforcement interceptor:
-/// 1. Enforces HTTPS only (strictly rejects cleartext HTTP downgrades).
-/// 2. Generates and injects a cryptographic `X-Request-Id` header for end-to-end tracing.
-/// 3. Injects timestamp header (`X-Timestamp`) for anti-replay defense.
-/// 4. Optional HMAC request signing hook (commented).
 class SecurityInterceptor extends Interceptor {
   SecurityInterceptor({this.allowHttpForLocalhost = true});
 
@@ -45,8 +42,6 @@ class SecurityInterceptor extends Interceptor {
     // 4. Client Platform Identity Header
     options.headers['X-Client-Platform'] = 'flutter';
 
-    // TODO: Optional Request Signing (HMAC-SHA256)
-    // If your backend requires signed requests with server-issued client keys:
     // final bodyBytes = utf8.encode(jsonEncode(options.data ?? ''));
     // final signature = Hmac(sha256, secretKey).convert(bodyBytes).toString();
     // options.headers['X-Signature'] = signature;

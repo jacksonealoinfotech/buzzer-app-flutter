@@ -85,6 +85,9 @@ dependencies:
   #
   # Typography & Fonts
   google_fonts: ^9.0.0
+  flutter_secure_storage: ^11.2.0
+  local_auth: ^3.0.2
+  freerasp: ^8.2.4
   #
   # Sentry Crash Reporting
   # sentry_flutter: ^8.14.0

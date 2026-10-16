@@ -70,6 +70,24 @@ void main() {
       );
     });
 
+    test('Restores authenticated state from stored refresh token', () async {
+      await tokenManager.initialize();
+      await tokenManager.saveTokens(
+        accessToken: 'memory_access_token_123',
+        refreshToken: 'secure_refresh_token_456',
+      );
+
+      final restartedTokenManager = TokenManager(
+        tokenStorage: tokenStorage,
+        preferences: preferences,
+      );
+      await restartedTokenManager.initialize();
+
+      expect(restartedTokenManager.getAccessToken(), isNull);
+      expect(restartedTokenManager.isAuthenticated, isTrue);
+      restartedTokenManager.dispose();
+    });
+
     test(
       'Single-flight refresh prevents parallel duplicate refreshes',
       () async {

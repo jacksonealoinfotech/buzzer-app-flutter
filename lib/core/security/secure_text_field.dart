@@ -1,17 +1,14 @@
 import 'dart:async';
+
+import 'package:buzzer_app/core/widgets/decorations/input_decoration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Security-hardened text entry field designed for passwords, PINs, and credentials.
-///
-/// Features:
-/// - `enableSuggestions: false` and `autocorrect: false` to prevent keyboard dictionary learning.
-/// - Obscure text toggle with accessible iconography.
-/// - Optional clipboard copy suppression (`disableCopy`).
-/// - Auto-clearing clipboard utility (`SecureClipboard.copyWithAutoClear`).
 class SecureTextField extends StatefulWidget {
   const SecureTextField({
     required this.controller,
+    required this.prefixIcon,
+    required this.lable,
     super.key,
     this.labelText,
     this.hintText,
@@ -20,7 +17,7 @@ class SecureTextField extends StatefulWidget {
     this.textInputAction = TextInputAction.done,
     this.autofillHints = const [AutofillHints.password],
     this.disableCopy = true,
-    this.prefixIcon,
+    this.suffix,
     this.onChanged,
   });
 
@@ -32,8 +29,10 @@ class SecureTextField extends StatefulWidget {
   final TextInputAction textInputAction;
   final Iterable<String>? autofillHints;
   final bool disableCopy;
-  final Widget? prefixIcon;
+  final IconData prefixIcon;
   final ValueChanged<String>? onChanged;
+  final String lable;
+  final Widget? suffix;
 
   @override
   State<SecureTextField> createState() => _SecureTextFieldState();
@@ -55,23 +54,12 @@ class _SecureTextFieldState extends State<SecureTextField> {
       autofillHints: widget.autofillHints,
       onChanged: widget.onChanged,
       validator: widget.validator,
-      decoration: InputDecoration(
-        labelText: widget.labelText,
-        hintText: widget.hintText,
-        prefixIcon: widget.prefixIcon,
-        suffixIcon: IconButton(
-          icon: Icon(
-            _obscureText
-                ? Icons.visibility_outlined
-                : Icons.visibility_off_outlined,
-          ),
-          tooltip: _obscureText ? 'Show password' : 'Hide password',
-          onPressed: () {
-            setState(() {
-              _obscureText = !_obscureText;
-            });
-          },
-        ),
+      decoration: decoration(
+        context,
+        hint: widget.hintText ?? '',
+        icon: widget.prefixIcon,
+        label: widget.lable,
+        suffix: widget.suffix,
       ),
     );
   }

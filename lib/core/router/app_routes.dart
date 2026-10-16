@@ -1,9 +1,11 @@
 import 'package:buzzer_app/core/di/injection.dart';
+import 'package:buzzer_app/core/security/token_manager.dart';
 import 'package:buzzer_app/features/hostFlow/create_game/presenation/screen/create_game_screen.dart';
 import 'package:buzzer_app/features/hostFlow/game_details/presenation/screen/game_details_screen.dart';
 import 'package:buzzer_app/features/hostFlow/host_dashboard/presenation/screen/host_dashboard_screen.dart';
 import 'package:buzzer_app/features/hostFlow/host_login/presenation/bloc/host_login_bloc.dart';
 import 'package:buzzer_app/features/hostFlow/host_login/presenation/screen/host_login_screen.dart';
+import 'package:buzzer_app/features/hostFlow/host_signup/presenation/bloc/host_signup_bloc.dart';
 import 'package:buzzer_app/features/hostFlow/host_signup/presenation/screen/host_signup_screen.dart';
 import 'package:buzzer_app/features/hostFlow/settings/presenation/screen/settings_screen.dart';
 import 'package:buzzer_app/features/playerFlow/quiz_question/presenation/screen/quiz_question_screen.dart';
@@ -29,7 +31,11 @@ class SplashRoute extends GoRouteData with $SplashRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) => SplashScreen(
     onFinished: () {
-      const SelectionRoute().go(context);
+      if (getIt<TokenManager>().isAuthenticated) {
+        const DashboardRoute().go(context);
+      } else {
+        const SelectionRoute().go(context);
+      }
     },
   );
 }
@@ -91,7 +97,11 @@ class HostLoginRoute extends GoRouteData with $HostLoginRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       BlocProvider<HostLoginBloc>(
         create: (_) => getIt<HostLoginBloc>(),
-        child: const HostLoginScreen(),
+        child: HostLoginScreen(
+          onCreateAccount: () {
+            const HostSignupRoute().go(context);
+          },
+        ),
       );
 }
 
@@ -101,7 +111,10 @@ class HostSignupRoute extends GoRouteData with $HostSignupRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const HostSignupScreen();
+      BlocProvider<HostSignupBloc>(
+        create: (_) => getIt<HostSignupBloc>(),
+        child: const HostSignupScreen(),
+      );
 }
 
 @TypedGoRoute<GameDetailsRoute>(path: '/game-details')

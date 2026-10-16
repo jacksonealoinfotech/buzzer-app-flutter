@@ -2,21 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:buzzer_app/core/config/flavor.dart';
+import 'package:freerasp/freerasp.dart';
 
-/// Policy dictating response when device integrity compromise is detected.
-enum IntegrityPolicy {
-  /// Allow execution without restrictions (standard for development).
-  allow,
-
-  /// Display security warning banner to user but continue operating.
-  warn,
-
-  /// Block sensitive features (e.g. biometrics, checkout, token persistence).
-  blockSensitiveFeatures,
-
-  /// Terminate session and prohibit application access completely.
-  blockApp,
-}
+enum IntegrityPolicy { allow, warn, blockSensitiveFeatures, blockApp }
 
 /// Result record holding hardware and software integrity checks.
 final class IntegrityReport {
@@ -42,22 +30,14 @@ final class IntegrityReport {
       isTampered;
 }
 
-/// Abstract contract for runtime device security & RASP protection.
 abstract interface class DeviceIntegrityService {
-  /// Evaluates device and environment state.
   Future<IntegrityReport> evaluateIntegrity();
 
-  /// Determines whether current application should block execution based on flavor policy.
   bool shouldBlockExecution(IntegrityReport report, Flavor flavor);
 }
 
-/// Production implementation of [DeviceIntegrityService].
-///
-/// Integrates with RASP (Runtime Application Self-Protection) solutions such as
-/// Talsec freeRASP or DexGuard.
 final class DefaultDeviceIntegrityService implements DeviceIntegrityService {
   // TODO: Uncomment when `freerasp` package is added:
-  // import 'package:freerasp/freerasp.dart';
 
   @override
   Future<IntegrityReport> evaluateIntegrity() async {

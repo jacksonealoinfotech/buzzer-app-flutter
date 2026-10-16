@@ -26,10 +26,19 @@ GoRouter createAppRouter({
     errorBuilder: (context, state) =>
         NotFoundScreen(errorMessage: state.error?.message),
     redirect: (BuildContext context, GoRouterState state) {
-      // Auth Guard Redirect:
-      // In this template, public demonstration routes are allowed.
-      // If a route requires authentication and tokenManager.isAuthenticated is false:
-      // return '/login';
+      final isAuthendicated = tokenManager.isAuthenticated;
+      final path = state.matchedLocation;
+      if (path == '/splash') return null;
+      if (isAuthendicated &&
+          (path == '/selection' ||
+              path == '/host-login' ||
+              path == 'host-signup')) {
+        return '/';
+      }
+      final isProtectedRoute = ['/', '/create-game', 'settings'].contains(path);
+      if (!isAuthendicated && isProtectedRoute) {
+        return '/host-login';
+      }
       return null;
     },
   );

@@ -7,7 +7,9 @@ abstract final class ApiEndpoints {
   static const String login = '$apiVersion/auth/login';
   static const String refreshToken = '$apiVersion/auth/refresh';
   static const String logout = '$apiVersion/auth/logout';
-  static const String register = '$apiVersion/auth/register';
+  static const String registerAdmin = '$apiVersion/auth/register/admin';
+  static const String registerHost = '$apiVersion/auth/register/host';
+  static const String registerPlayer = '$apiVersion/auth/register/player';
 
   // User & Profile
   static const String userProfile = '$apiVersion/users/me';

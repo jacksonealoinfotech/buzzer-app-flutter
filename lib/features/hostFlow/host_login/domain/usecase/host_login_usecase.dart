@@ -6,6 +6,7 @@ import 'package:injectable/injectable.dart';
 class HostLoginUsecase {
   final HostLoginRepo repo;
   HostLoginUsecase({required this.repo});
-  Future<void> call({required HostLoginEntity hostData}) async =>
-      repo.login(hostData);
+  Future<Map<String, dynamic>> call({
+    required HostLoginEntity hostData,
+  }) async => repo.login(hostData);
 }

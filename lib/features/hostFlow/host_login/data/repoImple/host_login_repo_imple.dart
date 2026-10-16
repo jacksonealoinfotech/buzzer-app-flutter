@@ -9,7 +9,8 @@ class HostLoginRepoImple extends HostLoginRepo {
   final HostLoginService service;
   HostLoginRepoImple({required this.service});
   @override
-  Future<void> login(HostLoginEntity hostData) async => await service.login(
-    HostLoginModel(email: hostData.email, password: hostData.password),
-  );
+  Future<Map<String, dynamic>> login(HostLoginEntity hostData) async =>
+      await service.login(
+        HostLoginModel(email: hostData.email, password: hostData.password),
+      );
 }
