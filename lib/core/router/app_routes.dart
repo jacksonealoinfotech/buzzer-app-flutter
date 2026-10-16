@@ -1,6 +1,8 @@
+import 'package:buzzer_app/core/di/injection.dart';
 import 'package:buzzer_app/features/hostFlow/create_game/presenation/screen/create_game_screen.dart';
 import 'package:buzzer_app/features/hostFlow/game_details/presenation/screen/game_details_screen.dart';
 import 'package:buzzer_app/features/hostFlow/host_dashboard/presenation/screen/host_dashboard_screen.dart';
+import 'package:buzzer_app/features/hostFlow/host_login/presenation/bloc/host_login_bloc.dart';
 import 'package:buzzer_app/features/hostFlow/host_login/presenation/screen/host_login_screen.dart';
 import 'package:buzzer_app/features/hostFlow/host_signup/presenation/screen/host_signup_screen.dart';
 import 'package:buzzer_app/features/hostFlow/settings/presenation/screen/settings_screen.dart';
@@ -13,6 +15,7 @@ import 'package:buzzer_app/features/playerFlow/signup/presenation/screen/signup_
 import 'package:buzzer_app/features/onboarding/splash/presenation/screen/splash_screen.dart';
 import 'package:buzzer_app/features/playerFlow/game_lobby/presenation/screen/game_lobby_screen.dart';
 import 'package:buzzer_app/features/playerFlow/join_game/presenation/screen/join_game_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:buzzer_app/core/responsive/adaptive_scaffold.dart';
 import 'package:buzzer_app/core/security/security_check_screen.dart';
@@ -86,7 +89,10 @@ class HostLoginRoute extends GoRouteData with $HostLoginRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const HostLoginScreen();
+      BlocProvider<HostLoginBloc>(
+        create: (_) => getIt<HostLoginBloc>(),
+        child: const HostLoginScreen(),
+      );
 }
 
 @TypedGoRoute<HostSignupRoute>(path: '/host-signup')

@@ -1,8 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:buzzer_app/core/router/app_routes.dart';
+import 'package:buzzer_app/features/hostFlow/host_login/data/model/host_login_model.dart';
+import 'package:buzzer_app/features/hostFlow/host_login/domain/entitiy/host_login_entity.dart';
+import 'package:buzzer_app/features/hostFlow/host_login/presenation/bloc/host_login_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HostLoginScreen extends StatefulWidget {
   const HostLoginScreen({
@@ -102,6 +106,14 @@ class _HostLoginScreenState extends State<HostLoginScreen>
 
   Future<void> _submit() async {
     const DashboardRoute().go(context);
+    context.read<HostLoginBloc>().add(
+      LoginHostEvent(
+        hostData: HostLoginModel(
+          email: _emailCtrl.text.trim(),
+          password: _passCtrl.text.trim(),
+        ),
+      ),
+    );
     // FocusScope.of(context).unfocus();
 
     // if (!_formKey.currentState!.validate()) {

@@ -20,15 +20,15 @@ enum Flavor {
 
   /// String identifier matching build configurations.
   String get name => switch (this) {
-        Flavor.dev => 'dev',
-        Flavor.staging => 'staging',
-        Flavor.prod => 'prod',
-      };
+    Flavor.dev => 'dev',
+    Flavor.staging => 'staging',
+    Flavor.prod => 'prod',
+  };
 
   /// Default API base URL for this environment.
   String get defaultBaseUrl => switch (this) {
-        Flavor.dev => 'https://api-dev.example.com',
-        Flavor.staging => 'https://api-staging.example.com',
-        Flavor.prod => 'https://api.example.com',
-      };
+    Flavor.dev => 'https://lmdnjvft-8000.inc1.devtunnels.ms/',
+    Flavor.staging => 'https://api-staging.example.com',
+    Flavor.prod => 'https://api.example.com',
+  };
 }

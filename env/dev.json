@@ -1,5 +1,5 @@
 {
-  "API_BASE_URL": "https://api-dev.example.com",
+  "API_BASE_URL": "https://lmdnjvft-8000.inc1.devtunnels.ms/",
   "CONNECT_TIMEOUT_SECONDS": "15",
   "RECEIVE_TIMEOUT_SECONDS": "15",
   "ENABLE_LOGGING": "true",
